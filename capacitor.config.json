@@ -1,0 +1,10 @@
+{
+  "appId": "com.schoolmanager.app",
+  "appName": "School Manager",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https",
+    "cleartext": true
+  }
+}
