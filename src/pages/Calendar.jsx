@@ -9,7 +9,7 @@ import '../styles/Calendar.css'
 export default function Calendar() {
   const navigate = useNavigate()
   const { user } = useAuth()
-  const isAdmin = user?.role === 'admin'
+  const canManageEvents = ['admin', 'member', 'teacher'].includes(user?.role)
   const { events, addEvent, deleteEvent, editEvent, students } = useAppContext()
   const [currentDate, setCurrentDate] = useState(new Date(2026, 5))
   const [showAddEvent, setShowAddEvent] = useState(false)
@@ -104,7 +104,7 @@ export default function Calendar() {
   }
 
   const handleDeleteEvent = async (eventId) => {
-    if (!isAdmin) { alert('Only the admin can delete calendar events.'); return }
+    if (!canManageEvents) { alert('Only authorized users can delete calendar events.'); return }
     if (!window.confirm('Are you sure you want to delete this event?')) return
     try {
       await deleteEvent(eventId)
@@ -116,6 +116,7 @@ export default function Calendar() {
   }
 
   const handleDayModalDelete = async (eventId) => {
+    if (!canManageEvents) { alert('Only authorized users can delete calendar events.'); return }
     if (!window.confirm('Delete this event?')) return
     try {
       await deleteEvent(eventId)
@@ -128,7 +129,7 @@ export default function Calendar() {
   }
 
   const handleEditClick = (event) => {
-    if (!isAdmin) { alert('Only the admin can edit calendar events.'); return }
+    if (!canManageEvents) { alert('Only authorized users can edit calendar events.'); return }
     setEditingEvent(event)
     const eventDate = new Date(event.date)
     const dateStr = `${eventDate.getFullYear()}-${String(eventDate.getMonth() + 1).padStart(2, '0')}-${String(eventDate.getDate()).padStart(2, '0')}`
@@ -138,7 +139,7 @@ export default function Calendar() {
 
   const handleEditSubmit = async (e) => {
     e.preventDefault()
-    if (!isAdmin) { alert('Only the admin can update calendar events.'); return }
+    if (!canManageEvents) { alert('Only authorized users can update calendar events.'); return }
     if (!formData.title || !formData.date) { alert('Please fill in required fields'); return }
     try {
       const result = await editEvent(editingEvent._id, { ...formData })
@@ -155,7 +156,7 @@ export default function Calendar() {
 
   const handleAddSubmit = async (e) => {
     e.preventDefault()
-    if (!isAdmin) { alert('Only the admin can add calendar events.'); return }
+    if (!canManageEvents) { alert('Only authorized users can add calendar events.'); return }
     if (!formData.title || !formData.date) { alert('Please fill in required fields'); return }
     try {
       const result = await addEvent({ ...formData })
@@ -170,6 +171,7 @@ export default function Calendar() {
   }
 
   const handleDayModalAdd = async () => {
+    if (!canManageEvents) { alert('Only authorized users can add calendar events.'); return }
     if (!dayFormData.title) { alert('Please enter a title'); return }
     try {
       const result = await addEvent({
@@ -232,7 +234,7 @@ export default function Calendar() {
               </div>
               <div className="header-actions">
                 <button className="back-btn" onClick={() => navigate('/dashboard')}>← Back</button>
-                {isAdmin
+                {canManageEvents
                   ? <button className="add-event-btn" onClick={() => setShowAddEvent(true)}>+ Add Event</button>
                   : <span className="view-only-chip">View only</span>
                 }
@@ -294,7 +296,7 @@ export default function Calendar() {
                         </div>
                         <div className="event-item-title">{event.title}</div>
                         <div className="event-item-desc">{event.description || 'No description'}</div>
-                        {isAdmin && (
+                        {canManageEvents && (
                           <div className="event-item-actions">
                             <button className="edit-btn" onClick={() => handleEditClick(event)}>✏️ Edit</button>
                             <button className="delete-btn" onClick={() => handleDeleteEvent(event._id)}>🗑️ Delete</button>
@@ -339,7 +341,7 @@ export default function Calendar() {
                         <p className="day-event-title">{ev.title}</p>
                         <p className="day-event-desc">{ev.description || 'No description'}</p>
                       </div>
-                      {isAdmin && (
+                      {canManageEvents && (
                         <div className="day-event-actions">
                           <button className="edit-btn" onClick={() => {
                             setShowDayModal(false)
@@ -355,7 +357,7 @@ export default function Calendar() {
                 </div>
               )}
 
-              {isAdmin && (
+              {canManageEvents && (
                 <>
                   {selectedDayEvents.length > 0 && <div className="modal-divider" />}
                   <p className="day-modal-section-label">Add New Event</p>
@@ -385,7 +387,7 @@ export default function Calendar() {
 
             <div className="modal-actions">
               <button className="cancel-btn" onClick={() => setShowDayModal(false)}>Close</button>
-              {isAdmin && (
+              {canManageEvents && (
                 <button className="submit-btn" onClick={handleDayModalAdd}>+ Add Event</button>
               )}
             </div>
