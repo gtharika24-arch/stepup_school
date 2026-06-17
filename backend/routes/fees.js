@@ -1,5 +1,5 @@
 import express from 'express'
-import { Fee } from '../models/Fee.js'
+import { Fee } from '../models/fee.js'
 
 const router = express.Router()
 
