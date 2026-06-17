@@ -1,5 +1,6 @@
-const fallbackApiHost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-  ? 'http://10.0.2.2:5000'
+const isLocalHost = ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname)
+const fallbackApiHost = isLocalHost
+  ? 'http://127.0.0.1:5000'
   : `http://${window.location.hostname}:5000`
 
 const BASE_API_URL = (import.meta.env.VITE_API_URL || fallbackApiHost).replace(/\/$/, '')
@@ -103,6 +104,47 @@ export const eventAPI = {
   },
   delete: async (id) => {
     const response = await fetch(`${API_URL}/events/${id}`, {
+      method: 'DELETE'
+    })
+    return handleResponse(response)
+  }
+}
+
+export const feeAPI = {
+  getAll: async () => {
+    const response = await fetch(`${API_URL}/fees`)
+    return handleResponse(response)
+  },
+  getById: async (id) => {
+    const response = await fetch(`${API_URL}/fees/${id}`)
+    return handleResponse(response)
+  },
+  create: async (feeData) => {
+    const response = await fetch(`${API_URL}/fees`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...feeData,
+        date: feeData.date || '',
+        amount: Number(feeData.amount) || 0
+      })
+    })
+    return handleResponse(response)
+  },
+  update: async (id, feeData) => {
+    const response = await fetch(`${API_URL}/fees/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...feeData,
+        date: feeData.date || '',
+        amount: Number(feeData.amount) || 0
+      })
+    })
+    return handleResponse(response)
+  },
+  delete: async (id) => {
+    const response = await fetch(`${API_URL}/fees/${id}`, {
       method: 'DELETE'
     })
     return handleResponse(response)

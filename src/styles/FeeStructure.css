@@ -1,0 +1,916 @@
+/* ── Page ─────────────────────────────────────────────────── */
+.fees-page {
+  padding: 1.5rem;
+}
+
+.fees-table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+}
+
+/* ── Class Tabs ───────────────────────────────────────────── */
+.class-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 1.25rem;
+}
+
+.class-tab {
+  padding: 8px 26px;
+  border-radius: 8px;
+  border: 1px solid #e4e4e4;
+  background: #fff;
+  font-size: 0.92rem;
+  font-weight: 500;
+  cursor: pointer;
+  color: #555;
+  transition: all 0.14s;
+}
+.class-tab:hover  { border-color: #4f46e5; color: #4f46e5; background: #f3f2ff; }
+.class-tab.active { background: #4f46e5; border-color: #4f46e5; color: #fff; }
+
+/* ── Toolbar ──────────────────────────────────────────────── */
+.fees-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.class-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+}
+.summary-label   { color: #999; }
+.summary-value   { font-weight: 600; color: #111; }
+.summary-divider { width: 1px; height: 13px; background: #ddd; margin: 0 4px; }
+
+/* ── Add Month Column control ─────────────────────────────── */
+.month-col-control {
+  position: relative;
+}
+
+.add-month-col-btn {
+  padding: 7px 14px;
+  border-radius: 7px;
+  border: 1px solid #c7c5f5;
+  background: #f4f3ff;
+  color: #4f46e5;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.13s;
+  white-space: nowrap;
+}
+.add-month-col-btn:hover    { background: #4f46e5; color: #fff; border-color: #4f46e5; }
+.add-month-col-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.month-picker-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: #fff;
+  border: 1px solid #e4e4e4;
+  border-radius: 9px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.10);
+  z-index: 200;
+  min-width: 150px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 6px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.month-pick-item {
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  color: #333;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.month-pick-item:hover { background: #f3f2ff; color: #4f46e5; }
+
+/* ── Table Wrapper ────────────────────────────────────────── */
+.fees-table-wrapper {
+  overflow-x: auto;
+  overflow-y: hidden;
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  width: 100%;
+}
+
+/* ── Table ────────────────────────────────────────────────── */
+.fees-table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 600px;
+  font-size: 0.82rem;
+  background: #fff;
+  table-layout: auto;
+}
+
+.fees-table thead tr { background: #f9f9fb; }
+
+.fees-table th {
+  padding: 11px 12px;
+  text-align: left;
+  font-weight: 600;
+  color: #666;
+  border-right: 1px solid #e8e8e8;
+  border-bottom: 1px solid #e8e8e8;
+  white-space: nowrap;
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.fees-table th:last-child {
+  border-right: none;
+}
+
+.fees-table td {
+  padding: 10px 12px;
+  border-right: 1px solid #f0f0f0;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: middle;
+}
+
+.fees-table td:last-child {
+  border-right: none;
+}
+
+.fees-table tbody tr:last-child td { border-bottom: none; }
+.fees-table tbody tr:hover          { background: #fafaff; }
+
+/* ── Column sizes ─────────────────────────────────────────── */
+.col-sno {
+  width: 44px;
+  text-align: center;
+  color: #bbb;
+  font-size: 0.75rem;
+}
+
+.col-name {
+  min-width: 160px;
+}
+
+.col-month { 
+  min-width: 155px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.col-month:hover {
+  background: #f8f7ff;
+}
+
+.col-hint  { min-width: 160px; color: #bbb; font-style: italic; font-size: 0.8rem; }
+
+.col-total {
+  min-width: 110px;
+  white-space: nowrap;
+}
+
+.col-actions {
+  min-width: 110px;
+  white-space: nowrap;
+}
+
+/* ── Month header with remove btn ────────────────────────── */
+.month-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.remove-month-btn {
+  background: none;
+  border: none;
+  font-size: 0.65rem;
+  color: #ccc;
+  cursor: pointer;
+  padding: 1px 3px;
+  border-radius: 3px;
+  line-height: 1;
+  transition: color 0.12s, background 0.12s;
+}
+.remove-month-btn:hover { color: #e53e3e; background: #fff0f0; }
+
+/* ── Student name cell ────────────────────────────────────── */
+.student-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #eceaff;
+  color: #4f46e5;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.student-name-text {
+  font-weight: 500;
+  color: #222;
+}
+
+/* ── Entry pill ───────────────────────────────────────────── */
+.entry-pill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f4f3ff;
+  border: 1px solid #dddaff;
+  border-radius: 7px;
+  padding: 6px 8px;
+  margin-bottom: 5px;
+  gap: 8px;
+}
+.entry-pill:last-child { margin-bottom: 0; }
+
+.entry-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.entry-amount {
+  font-weight: 700;
+  color: #3730a3;
+  font-size: 0.83rem;
+}
+
+.entry-date {
+  font-size: 0.69rem;
+  color: #888;
+}
+
+.entry-btns {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.pill-btn {
+  padding: 3px 8px;
+  border-radius: 5px;
+  border: 1px solid;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.12s;
+  line-height: 1.3;
+}
+
+.edit-btn {
+  background: #fff;
+  border-color: #c7c5f5;
+  color: #4f46e5;
+}
+.edit-btn:hover { background: #4f46e5; color: #fff; border-color: #4f46e5; }
+
+.del-btn {
+  background: #fff;
+  border-color: #fca5a5;
+  color: #dc2626;
+}
+.del-btn:hover { background: #dc2626; color: #fff; border-color: #dc2626; }
+
+.no-entry { 
+  color: #ccc; 
+  font-size: 0.8rem;
+  display: block;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.col-month:hover .no-entry {
+  color: #999;
+}
+
+/* ── Total ────────────────────────────────────────────────── */
+.total-amount {
+  font-weight: 700;
+  color: #4f46e5;
+  font-size: 0.88rem;
+}
+
+/* ── Add Fee button ───────────────────────────────────────── */
+.add-fee-btn {
+  padding: 6px 14px;
+  border-radius: 7px;
+  border: 1px solid #c7c5f5;
+  background: #f4f3ff;
+  color: #4f46e5;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.13s;
+}
+.add-fee-btn:hover { background: #4f46e5; color: #fff; border-color: #4f46e5; }
+
+/* ──────────────────────────────────────────────────────────
+   RESPONSIVE: 1024px and below (Tablets)
+   ────────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .fees-page { padding: 1rem; }
+  .class-tabs { flex-wrap: wrap; }
+  .fees-toolbar { align-items: stretch; }
+  
+  .fees-table {
+    min-width: 700px;
+    font-size: 0.8rem;
+  }
+  
+  .fees-table th {
+    padding: 9px 10px;
+    font-size: 0.7rem;
+  }
+  
+  .fees-table td {
+    padding: 8px 10px;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   RESPONSIVE: 768px and below (Mobile Tablets)
+   ────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .fees-page {
+    padding: 1rem;
+  }
+
+  .fees-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin-bottom: 1.25rem;
+  }
+
+  .class-summary {
+    flex-wrap: wrap;
+    gap: 6px;
+    font-size: 0.8rem;
+  }
+
+  .month-col-control {
+    width: 100%;
+  }
+
+  .add-month-col-btn {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+  }
+
+  .month-picker-dropdown {
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-height: 280px;
+  }
+
+  /* Table optimizations for tablet */
+  .fees-table {
+    min-width: 680px;
+    font-size: 0.78rem;
+  }
+
+  .fees-table th {
+    padding: 8px 8px;
+    font-size: 0.68rem;
+  }
+
+  .fees-table td {
+    padding: 7px 8px;
+  }
+
+  .col-sno {
+    width: 38px;
+    font-size: 0.68rem;
+  }
+
+  .col-name {
+    min-width: 130px;
+  }
+
+  .col-month {
+    min-width: 120px;
+  }
+
+  .col-total, .col-actions {
+    min-width: 95px;
+  }
+
+  /* Entry pill on tablet */
+  .entry-pill {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 5px;
+    gap: 4px;
+  }
+
+  .entry-btns {
+    width: 100%;
+    justify-content: flex-end;
+    gap: 4px;
+  }
+
+  .pill-btn {
+    padding: 3px 8px;
+    font-size: 0.68rem;
+  }
+
+  .entry-amount {
+    font-size: 0.78rem;
+  }
+
+  .entry-date {
+    font-size: 0.65rem;
+  }
+
+  /* Modal adjustments */
+  .modal-box {
+    width: 90vw;
+    max-width: 420px;
+  }
+
+  .field-input {
+    padding: 10px 12px;
+    font-size: 16px;
+  }
+
+  .class-tab {
+    padding: 7px 16px;
+    font-size: 0.85rem;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   RESPONSIVE: 480px and below (Mobile Phones)
+   ────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .fees-page { 
+    padding: 0.75rem;
+  }
+
+  /* Class tabs on mobile */
+  .class-tabs {
+    gap: 5px;
+    margin-bottom: 1rem;
+  }
+
+  .class-tab {
+    flex: 1 1 calc(33.333% - 4px);
+    text-align: center;
+    padding: 6px 8px;
+    font-size: 0.75rem;
+    border-radius: 6px;
+  }
+
+  /* Toolbar on mobile */
+  .fees-toolbar {
+    gap: 8px;
+    margin-bottom: 0.75rem;
+  }
+
+  .class-summary {
+    font-size: 0.7rem;
+    width: 100%;
+    gap: 4px;
+  }
+
+  .summary-divider {
+    height: 11px;
+    margin: 0 2px;
+  }
+
+  .add-month-col-btn {
+    font-size: 0.75rem;
+    padding: 8px 10px;
+    width: 100%;
+  }
+
+  /* Table heavily optimized for mobile */
+  .fees-table {
+    min-width: 440px;
+    font-size: 0.7rem;
+  }
+
+  .fees-table th {
+    padding: 6px 4px;
+    font-size: 0.62rem;
+    padding: 5px 3px;
+  }
+
+  .fees-table td {
+    padding: 5px 4px;
+  }
+
+  .col-sno {
+    width: 30px;
+    font-size: 0.65rem;
+  }
+
+  .col-name {
+    min-width: 100px;
+  }
+
+  .col-month {
+    min-width: 95px;
+  }
+
+  .col-total, .col-actions {
+    min-width: 80px;
+  }
+
+  /* Student name cell on mobile */
+  .student-name-cell {
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+
+  .avatar {
+    width: 24px;
+    height: 24px;
+    font-size: 10px;
+  }
+
+  .student-name-text {
+    font-size: 0.7rem;
+    font-weight: 500;
+  }
+
+  /* Entry pill on mobile */
+  .entry-pill {
+    padding: 4px 4px;
+    margin-bottom: 3px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+  }
+
+  .entry-info {
+    width: 100%;
+    gap: 1px;
+  }
+
+  .entry-amount {
+    font-size: 0.7rem;
+  }
+
+  .entry-date {
+    font-size: 0.6rem;
+  }
+
+  .entry-btns {
+    width: 100%;
+    gap: 3px;
+  }
+
+  .pill-btn {
+    flex: 1;
+    padding: 3px 5px;
+    font-size: 0.6rem;
+  }
+
+  /* Add fee button on mobile */
+  .add-fee-btn {
+    width: 100%;
+    padding: 6px 10px;
+    font-size: 0.7rem;
+  }
+
+  .total-amount {
+    font-size: 0.75rem;
+  }
+
+  /* Modal on mobile */
+  .modal-backdrop {
+    padding: 10px;
+  }
+
+  .modal-box {
+    width: 100%;
+    max-width: 95vw;
+    border-radius: 10px;
+  }
+
+  .confirm-box {
+    width: 100%;
+  }
+
+  .modal-header {
+    padding: 12px 14px 8px;
+  }
+
+  .modal-header h3 {
+    font-size: 0.85rem;
+  }
+
+  .modal-body {
+    padding: 10px 14px 6px;
+  }
+
+  .field-label {
+    font-size: 0.65rem;
+    margin-top: 6px;
+  }
+
+  .field-input {
+    padding: 9px 10px;
+    font-size: 16px;
+    margin-top: 3px;
+  }
+
+  .form-error {
+    font-size: 0.65rem;
+    margin-top: 3px;
+  }
+
+  .modal-footer {
+    flex-direction: column-reverse;
+    gap: 6px;
+    padding: 8px 14px 12px;
+  }
+
+  .btn-cancel, .btn-save, .btn-delete {
+    width: 100%;
+    padding: 9px 12px;
+    font-size: 0.75rem;
+  }
+
+  /* Empty state */
+  .empty-state {
+    padding: 1.5rem 0.75rem;
+  }
+
+  .empty-icon {
+    font-size: 1.25rem;
+  }
+
+  .empty-state p {
+    font-size: 0.75rem;
+  }
+
+  /* Month picker on mobile */
+  .month-picker-dropdown {
+    max-height: 220px;
+  }
+
+  .month-pick-item {
+    padding: 8px 12px;
+    font-size: 0.75rem;
+  }
+}
+
+/* ── Empty state ──────────────────────────────────────────── */
+.empty-row { padding: 0 !important; }
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3rem 1rem;
+  gap: 8px;
+}
+.empty-icon         { font-size: 2rem; opacity: 0.3; }
+.empty-state p      { font-size: 0.85rem; color: #bbb; margin: 0; }
+
+/* ── Modal backdrop ───────────────────────────────────────── */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.32);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+/* ── Modal box ────────────────────────────────────────────── */
+.modal-box {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e8e8e8;
+  width: 360px;
+  max-width: 94vw;
+  box-shadow: 0 10px 36px rgba(0,0,0,0.13);
+  overflow: hidden;
+}
+.confirm-box { width: 320px; }
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+.modal-header h3 {
+  font-size: 0.96rem;
+  font-weight: 600;
+  color: #111;
+  margin: 0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 0.88rem;
+  color: #aaa;
+  cursor: pointer;
+  padding: 3px 7px;
+  border-radius: 5px;
+}
+.modal-close:hover { background: #f5f5f5; color: #333; }
+
+/* ── Modal body ───────────────────────────────────────────── */
+.modal-body {
+  padding: 16px 20px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.field-label {
+  font-size: 0.73rem;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 10px;
+}
+
+.field-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border: 1px solid #e2e2e2;
+  border-radius: 7px;
+  font-size: 0.88rem;
+  color: #222;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.13s, box-shadow 0.13s;
+  margin-top: 4px;
+}
+.field-input:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px #eceaff; }
+
+.form-error {
+  font-size: 0.76rem;
+  color: #dc2626;
+  margin: 6px 0 0;
+}
+
+.confirm-text {
+  font-size: 0.88rem;
+  color: #444;
+  line-height: 1.6;
+  margin: 0;
+}
+/* ── Search Box ───────────────────────────────────────────── */
+.search-box {
+  position: relative;
+  flex: 0 1 1 220px;
+  min-width: 700px;
+  max-width: 200px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 6px 28px 6px 10px;
+  border: 1px solid #ccc5c5;
+  border-radius: 7px;
+  font-size: 0.85rem;
+  color: #e32a2a;
+  background: #ffffff;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.10s;
+  box-sizing: border-box;
+}
+
+.search-input::placeholder {
+  color: #999999;
+  font-size: 0.78rem;
+}
+
+
+
+.search-clear-btn {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 0.75rem;
+  color: #dcdbdb;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: color 0.12s, background 0.12s;
+}
+
+.search-clear-btn:hover {
+  color: #7e7b7b;
+  background: #dcd9d9;
+}
+
+/* ── Responsive: Tablet ───────────────────────────────────── */
+@media (max-width: 768px) {
+  .search-box {
+    min-width: auto;
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 10px 32px 10px 12px;
+    font-size: 16px; /* Prevents zoom on mobile */
+  }
+}
+
+/* ── Responsive: Mobile ───────────────────────────────────── */
+@media (max-width: 480px) {
+  .search-box {
+    width: 100%;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 10px 32px 10px 12px;
+    font-size: 16px;
+    border-radius: 6px;
+  }
+}
+/* ── Modal footer ─────────────────────────────────────────── */
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 20px 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.btn-cancel {
+  padding: 7px 16px;
+  border-radius: 7px;
+  border: 1px solid #e0e0e0;
+  background: #fff;
+  color: #555;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.btn-cancel:hover { background: #f5f5f5; }
+
+.btn-save {
+  padding: 7px 18px;
+  border-radius: 7px;
+  border: none;
+  background: #4f46e5;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.btn-save:hover { background: #4338ca; }
+
+.btn-delete {
+  padding: 7px 18px;
+  border-radius: 7px;
+  border: none;
+  background: #dc2626;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.btn-delete:hover { background: #b91c1c; }

@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import { connectDB } from './config/database.js'
 import studentRoutes from './routes/students.js'
 import eventRoutes from './routes/events.js'
+import feeRoutes from './routes/fees.js'
 
 dotenv.config({ override: true })
 
@@ -23,6 +24,7 @@ connectDB()
 // Routes
 app.use('/api/students', studentRoutes)
 app.use('/api/events', eventRoutes)
+app.use('/api/fees', feeRoutes)
 
 // Health check
 app.get('/api/health', (req, res) => {

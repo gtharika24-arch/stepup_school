@@ -1,15 +1,16 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAppContext } from '../context/AppContext'
 import { studentAPI } from '../utils/api'
 import { getStudentReminders } from '../utils/reminderUtils'
+import Sidebar from '../components/Sidebar'
 import '../styles/StudentList.css'
 
 export default function StudentList() {
   const { classLevel } = useParams()
   const navigate = useNavigate()
-  const { students, addStudent, deleteStudent, setStudents, loading } = useAppContext()
-  const classList = students[classLevel] || []
+  const { students, addStudent, deleteStudent, setStudents, loading, currentUser } = useAppContext()
+  const classList = useMemo(() => students[classLevel] || [], [students, classLevel])
 
   const [showAddForm, setShowAddForm] = useState(false)
   const [editingStudent, setEditingStudent] = useState(null)
@@ -34,13 +35,12 @@ export default function StudentList() {
 
   // 📅 Update reminders when students change
   useEffect(() => {
-    const allReminders = [];
+    const allReminders = []
     classList.forEach(student => {
-      const studentReminders = getStudentReminders(student, 3); // Next 3 days
-      allReminders.push(...studentReminders);
-    });
-    // Sort by days until
-    setReminders(allReminders.sort((a, b) => a.daysUntil - b.daysUntil));
+      allReminders.push(...getStudentReminders(student, 3))
+    })
+
+    setReminders([...allReminders].sort((a, b) => a.daysUntil - b.daysUntil))
   }, [classList])
 
   // 🔍 Filter
@@ -151,6 +151,12 @@ export default function StudentList() {
     return isNaN(d) ? '-' : d.toLocaleDateString()
   }
 
+  const classes = [
+    { key: 'PreKG', icon: '🎓', label: 'PreKG', desc: 'Pre-Kindergarten' },
+    { key: 'LKG', icon: '📚', label: 'LKG', desc: 'Lower Kindergarten' },
+    { key: 'UKG', icon: '✏️', label: 'UKG', desc: 'Upper Kindergarten' },
+  ]
+
   const sortOptions = [
     { value: 'none',      label: '— Sort By —' },
     { value: 'name-az',   label: '🔤 Name: A → Z' },
@@ -159,179 +165,208 @@ export default function StudentList() {
     { value: 'dob-desc',  label: '📅 DOB: Youngest First' },
   ]
 
-  const headerColors = {
-    PreKG: 'linear-gradient(135deg, #ffe0ec 0%, #ffd6a5 50%, #c9b8f5 100%)',
-    LKG:   'linear-gradient(135deg, #c9f2e5 0%, #a8d8ea 50%, #c9b8f5 100%)',
-    UKG:   'linear-gradient(135deg, #e4d9ff 0%, #fbc2eb 50%, #ffd6a5 100%)',
-  }
-
   return (
-    <div className="student-list-container">
-      <header
-        className="student-header"
-        style={{ background: headerColors[classLevel] || headerColors.PreKG }}
-      >
-        <button onClick={() => navigate('/dashboard')} className="back-btn">
-          ← Back
-        </button>
-        <h1>
-          {classLevel === 'PreKG' ? '🎓' : classLevel === 'LKG' ? '📚' : '✏️'} {classLevel} — Student List
-        </h1>
-        <button
-          onClick={() => { setEditingStudent(null); setFormData(emptyForm); setShowAddForm(true) }}
-          className="add-student-btn"
-        >
-          + Add Student
-        </button>
-      </header>
+    <div className="dashboard-container student-list-container">
+      <div className="dashboard-shell student-page-shell">
+        <Sidebar />
 
-      <main className="student-main">
-        {/* 🎉 Reminders Section */}
-        {showReminders && reminders.length > 0 && (
-          <div className="reminders-section">
-            <div className="reminders-header">
-              <h3>🎉 Upcoming Reminders (Next 3 Days)</h3>
-              <button 
-                className="close-reminders" 
-                onClick={() => setShowReminders(false)}
-              >
-                ✕
-              </button>
+        <div className="dashboard-content student-content">
+          <header className="dashboard-topbar student-topbar">
+            <div className="topbar-title student-breadcrumb">
+              <span className="breadcrumb-label">Students</span>
+              <span className="breadcrumb-separator">•</span>
+              <span className="breadcrumb-current">{classLevel}</span>
             </div>
-            <div className="reminders-grid">
-              {reminders.slice(0, 5).map((reminder, idx) => (
-                <div 
-                  key={idx} 
-                  className="reminder-card"
-                  style={{ borderLeftColor: reminder.color }}
+          </header>
+
+          <main className="dashboard-main student-main">
+            {!classLevel ? (
+              <section className="student-page-header">
+                <div>
+                  <h1>Students</h1>
+                  <p className="student-subtitle">Choose a class to view its student list.</p>
+                </div>
+              </section>
+            ) : (
+              <section className="student-page-header">
+                <div>
+                  <h1>{classLevel} — Student List</h1>
+                  <p className="student-subtitle">Manage student records</p>
+                </div>
+                <button
+                  onClick={() => { setEditingStudent(null); setFormData(emptyForm); setShowAddForm(true) }}
+                  className="add-student-btn"
                 >
-                  <div className="reminder-emoji">{reminder.emoji}</div>
-                  <div className="reminder-content">
-                    <p className="reminder-message">{reminder.message}</p>
-                  </div>
-                  <div className="reminder-days">
-                    {reminder.daysUntil === 0 ? '🎯 TODAY' : reminder.daysUntil === 1 ? '📅 TMRW' : `${reminder.daysUntil}d`}
-                  </div>
-                </div>
-              ))}
-              {reminders.length > 5 && (
-                <div className="reminder-more">
-                  +{reminders.length - 5} more reminders
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Toolbar */}
-        <div className="student-toolbar">
-          <p className="total-students">
-            Total Students: <strong>{classList.length}</strong>
-            {searchQuery && filteredList.length !== classList.length && (
-              <span className="search-count"> (showing {filteredList.length})</span>
+                  + Add Student
+                </button>
+              </section>
             )}
-          </p>
 
-          <div className="toolbar-right">
-            {/* Search */}
-            <div className="search-box">
-              <span className="search-icon">🔍</span>
-              <input
-                type="text"
-                placeholder="Search name, father, mother, phone..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="search-input"
-              />
-              {searchQuery && (
-                <button className="clear-search" onClick={() => setSearchQuery('')}>✕</button>
-              )}
-            </div>
-
-            {/* Sort */}
-            <div className="sort-box">
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="sort-select"
-              >
-                {sortOptions.map(opt => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+            {!classLevel ? (
+              <section className="student-select-grid">
+                {classes.map(item => (
+                  <button
+                    key={item.key}
+                    type="button"
+                    className="student-class-card"
+                    onClick={() => navigate(`/students/${item.key}`)}
+                  >
+                    <span className="student-class-icon">{item.icon}</span>
+                    <span className="student-class-name">{item.label}</span>
+                    <span className="student-class-desc">{item.desc}</span>
+                    <span className="student-class-arrow">Open list →</span>
+                  </button>
                 ))}
-              </select>
-              {sortBy !== 'none' && (
-                <button className="clear-sort" onClick={() => setSortBy('none')}>✕</button>
-              )}
-            </div>
-          </div>
-        </div>
+              </section>
+            ) : (
+              <>
+                {showReminders && reminders.length > 0 && (
+                  <div className="reminders-section">
+                    <div className="reminders-header">
+                      <h3>🎉 Upcoming Reminders (Next 3 Days)</h3>
+                      <button
+                        className="close-reminders"
+                        onClick={() => setShowReminders(false)}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    <div className="reminders-grid">
+                      {reminders.slice(0, 5).map((reminder, idx) => (
+                        <div
+                          key={idx}
+                          className="reminder-card"
+                          style={{ borderLeftColor: reminder.color }}
+                        >
+                          <div className="reminder-emoji">{reminder.emoji}</div>
+                          <div className="reminder-content">
+                            <p className="reminder-message">{reminder.message}</p>
+                          </div>
+                          <div className="reminder-days">
+                            {reminder.daysUntil === 0 ? '🎯 TODAY' : reminder.daysUntil === 1 ? '📅 TMRW' : `${reminder.daysUntil}d`}
+                          </div>
+                        </div>
+                      ))}
+                      {reminders.length > 5 && (
+                        <div className="reminder-more">
+                          +{reminders.length - 5} more reminders
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
 
-        {loading && <div className="loading">🌸 Loading students...</div>}
+                <div className="student-toolbar">
+                  <p className="total-students">
+                    Total Students: <strong>{classList.length}</strong>
+                    {searchQuery && filteredList.length !== classList.length && (
+                      <span className="search-count"> (showing {filteredList.length})</span>
+                    )}
+                  </p>
 
-        <div className="table-responsive">
-          <table className="students-table">
-            <thead>
-              <tr>
-                <th
-                  className={`sortable-th ${sortBy.startsWith('name') ? 'active-sort' : ''}`}
-                  onClick={() => setSortBy(prev => prev === 'name-az' ? 'name-za' : 'name-az')}
-                >
-                  Student Name
-                  <span className="sort-arrow">
-                    {sortBy === 'name-az' ? ' ▲' : sortBy === 'name-za' ? ' ▼' : ' ⇅'}
-                  </span>
-                </th>
-                <th
-                  className={`sortable-th ${sortBy.startsWith('dob') ? 'active-sort' : ''}`}
-                  onClick={() => setSortBy(prev => prev === 'dob-asc' ? 'dob-desc' : 'dob-asc')}
-                >
-                  DOB
-                  <span className="sort-arrow">
-                    {sortBy === 'dob-asc' ? ' ▲' : sortBy === 'dob-desc' ? ' ▼' : ' ⇅'}
-                  </span>
-                </th>
-                <th>Father Name</th>
-                <th>Father Phone</th>
-                <th>Father DOB</th>
-                <th>Mother Name</th>
-                <th>Mother Phone</th>
-                <th>Mother DOB</th>
-                <th>Parents Anniversary</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredList.length > 0 ? (
-                filteredList.map((student) => (
-                  <tr key={student._id || student.id}>
-                    <td className="student-name">{student.name}</td>
-                    <td>{formatDate(student.dob)}</td>
-                    <td>{student.fatherName}</td>
-                    <td>{student.fatherPhone}</td>
-                    <td>{formatDate(student.fatherDob)}</td>
-                    <td>{student.motherName}</td>
-                    <td>{student.motherPhone}</td>
-                    <td>{formatDate(student.motherDob)}</td>
-                    <td>{formatDate(student.parentsAnniversary)}</td>
-                    <td className="action-btns">
-                      <button className="edit-btn" onClick={() => handleEdit(student)}>✏️ Edit</button>
-                      <button className="delete-btn" onClick={() => handleDelete(student)}>🗑️ Delete</button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="10" className="no-students">
-                    {searchQuery
-                      ? `🔍 No students found matching "${searchQuery}"`
-                      : '🌸 No students found in this class'}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                  <div className="toolbar-right">
+                    <div className="search-box">
+                      <span className="search-icon">🔍</span>
+                      <input
+                        type="text"
+                        placeholder="Search name, father, mother, phone..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="search-input"
+                      />
+                      {searchQuery && (
+                        <button className="clear-search" onClick={() => setSearchQuery('')}>✕</button>
+                      )}
+                    </div>
+
+                    <div className="sort-box">
+                      <select
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value)}
+                        className="sort-select"
+                      >
+                        {sortOptions.map(opt => (
+                          <option key={opt.value} value={opt.value}>{opt.label}</option>
+                        ))}
+                      </select>
+                      {sortBy !== 'none' && (
+                        <button className="clear-sort" onClick={() => setSortBy('none')}>✕</button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {loading && <div className="loading">Loading students...</div>}
+
+                <div className="table-card">
+                  <table className="students-table">
+                    <thead>
+                      <tr>
+                        <th
+                          className={`sortable-th ${sortBy.startsWith('name') ? 'active-sort' : ''}`}
+                          onClick={() => setSortBy(prev => prev === 'name-az' ? 'name-za' : 'name-az')}
+                        >
+                          Student Name
+                          <span className="sort-arrow">
+                            {sortBy === 'name-az' ? ' ▲' : sortBy === 'name-za' ? ' ▼' : ' ⇅'}
+                          </span>
+                        </th>
+                        <th
+                          className={`sortable-th ${sortBy.startsWith('dob') ? 'active-sort' : ''}`}
+                          onClick={() => setSortBy(prev => prev === 'dob-asc' ? 'dob-desc' : 'dob-asc')}
+                        >
+                          DOB
+                          <span className="sort-arrow">
+                            {sortBy === 'dob-asc' ? ' ▲' : sortBy === 'dob-desc' ? ' ▼' : ' ⇅'}
+                          </span>
+                        </th>
+                        <th>Father Name</th>
+                        <th>Father Phone</th>
+                        <th>Father DOB</th>
+                        <th>Mother Name</th>
+                        <th>Mother Phone</th>
+                        <th>Mother DOB</th>
+                        <th>Parents Anniversary</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredList.length > 0 ? (
+                        filteredList.map((student) => (
+                          <tr key={student._id || student.id}>
+                            <td className="student-name">{student.name}</td>
+                            <td>{formatDate(student.dob)}</td>
+                            <td>{student.fatherName}</td>
+                            <td>{student.fatherPhone}</td>
+                            <td>{formatDate(student.fatherDob)}</td>
+                            <td>{student.motherName}</td>
+                            <td>{student.motherPhone}</td>
+                            <td>{formatDate(student.motherDob)}</td>
+                            <td>{formatDate(student.parentsAnniversary)}</td>
+                            <td className="action-btns">
+                              <button className="edit-btn" onClick={() => handleEdit(student)}>✏️ Edit</button>
+                              <button className="delete-btn" onClick={() => handleDelete(student)}>🗑️ Delete</button>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan="10" className="no-students">
+                            <div className="empty-state-card">
+                              <span className="empty-icon" aria-hidden="true">👤</span>
+                              <p className="empty-text">No students found in this class</p>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            )}
+          </main>
         </div>
-      </main>
+      </div>
 
       {/* Add / Edit Modal */}
       {showAddForm && (

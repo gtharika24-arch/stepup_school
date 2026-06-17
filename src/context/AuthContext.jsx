@@ -3,26 +3,39 @@ import React, { createContext, useState, useContext } from 'react'
 const AuthContext = createContext()
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null)
-  const [teachers, setTeachers] = useState([
-    { id: 1, email: 'teacher1@school.com', password: '123456', name: 'John Smith' },
-    { id: 2, email: 'teacher2@school.com', password: '123456', name: 'Sarah Johnson' },
-    { id: 3, email: 'teacher3@school.com', password: '123456', name: 'Mike Davis' },
+  const [user, setUser] = useState(() => {
+    try {
+      const savedUser = localStorage.getItem('school-user')
+      return savedUser ? JSON.parse(savedUser) : null
+    } catch (error) {
+      console.error('Failed to load saved user:', error)
+      return null
+    }
+  })
+
+  const [teachers] = useState([
+    { id: 1, email: 'admin@school.com', password: 'stepup', name: 'Admin User', role: 'admin' },
+    { id: 2, email: 'member@school.com', password: 'member123', name: 'Teacher', role: 'member' },
   ])
 
   const login = (email, password) => {
     const teacher = teachers.find(
       (t) => t.email === email && t.password === password
     )
+
     if (teacher) {
-      setUser(teacher)
+      const userToStore = { ...teacher }
+      setUser(userToStore)
+      localStorage.setItem('school-user', JSON.stringify(userToStore))
       return true
     }
+
     return false
   }
 
   const logout = () => {
     setUser(null)
+    localStorage.removeItem('school-user')
   }
 
   return (

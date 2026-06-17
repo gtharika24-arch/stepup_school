@@ -3,7 +3,7 @@ import dotenv from 'dotenv'
 
 dotenv.config({ override: true })
 
-const FALLBACK_URI = 'mongodb://127.0.0.1:27017/school_management'
+const FALLBACK_URI = 'mongodb://127.0.0.1:27017/student_management'
 
 export const getMongoUri = () => {
   const configuredUri = process.env.MONGODB_URI || FALLBACK_URI
