@@ -1,8 +1,8 @@
 const isLocalHost = ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname)
 const fallbackApiHost = isLocalHost
   ? 'http://127.0.0.1:5000'
-  : `http://${window.location.hostname}:5000`
-
+  : 'https://stepup-school-backend.onrender.com'
+  
 const BASE_API_URL = (import.meta.env.VITE_API_URL || fallbackApiHost).replace(/\/$/, '')
 const API_URL = `${BASE_API_URL}/api`
 
