@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useAppContext } from '../context/AppContext'
-import { useAuth } from '../context/AuthContext'  // ✅ Add this
+import { useAuth } from '../context/AuthContext'
 import { getStudentReminders } from '../utils/reminderUtils'
 import Sidebar from '../components/Sidebar'
 import '../styles/Dashboard.css'
@@ -9,7 +9,7 @@ import { useState, useEffect } from 'react'
 export default function Dashboard() {
   const navigate = useNavigate()
   const { students, events } = useAppContext()
-  const { user: currentUser } = useAuth()  // ✅ Use this instead
+  const { user: currentUser } = useAuth()
   const [eventReminders, setEventReminders] = useState([])
   const [birthdayReminders, setBirthdayReminders] = useState([])
 
@@ -22,7 +22,10 @@ export default function Dashboard() {
       .slice(0, 3)
   }
 
+  // ✅ FIX: Use specific dependencies that track data changes
   useEffect(() => {
+    if (!students || !events) return
+
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     
@@ -61,7 +64,7 @@ export default function Dashboard() {
       }
     })
     setBirthdayReminders(bdayReminders.sort((a, b) => a.daysUntil - b.daysUntil))
-  }, [students, events])
+  }, [events.length, Object.keys(students).length]) // ✅ Use .length to track changes
 
   const upcomingEvents = getUpcomingEvents()
   
@@ -83,7 +86,7 @@ export default function Dashboard() {
   }, 0)
 
   // ✅ Check if user is admin
-  const isAdmin = currentUser?.role === 'admin'
+  const isAdmin = currentUser?.role === 'admin' || currentUser?.role === 'Administrator'
   const userRole = isAdmin ? 'Admin' : 'Teacher'
 
   return (
@@ -97,7 +100,7 @@ export default function Dashboard() {
         <div className="dashboard-header">
           <div>
             <h1>Dashboard</h1>
-            <p className="header-subtitle">Welcome back! </p>
+            <p className="header-subtitle">Welcome back!</p>
           </div>
         </div>
 
@@ -107,7 +110,6 @@ export default function Dashboard() {
           <section className="greeting-card">
             <div className="greeting-content">
               <div>
-                {/* ✅ Show role in greeting */}
                 <h2 className="greeting-title">Good Morning, {currentUser?.name || 'User'}!</h2>
                 <p className="greeting-date">{todayLabel} · <span className="user-role-badge">{userRole}</span></p>
               </div>
@@ -177,7 +179,6 @@ export default function Dashboard() {
               </div>
             </section>
           </div>
-
 
           {/* Classes Section */}
           <section className="classes-section">

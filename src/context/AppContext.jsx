@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react'
+import React, { createContext, useState, useContext, useEffect, useMemo } from 'react'
 import { studentAPI, eventAPI } from '../utils/api'
 import { getClassReminders } from '../utils/reminderUtils'
 
@@ -55,7 +55,7 @@ export const AppProvider = ({ children }) => {
 
   useEffect(() => {
     fetchAllData()
-  }, [])
+  }, []) // ✅ EMPTY dependency array - runs only ONCE on mount
 
   const fetchAllData = async () => {
     try {
@@ -170,23 +170,27 @@ export const AppProvider = ({ children }) => {
     }
   }
 
+  // ✅ CRITICAL: Memoize the entire context value
+  // This prevents recreating the object on every render, which was causing the infinite loop
+  const value = useMemo(() => ({
+    currentUser,
+    students,
+    events,
+    birthdays,
+    loading,
+    error,
+    addStudent,
+    deleteStudent,
+    addEvent,
+    deleteEvent,
+    editEvent,
+    fetchAllData,
+    setStudents,
+    setEvents
+  }), [currentUser, students, events, birthdays, loading, error])
+
   return (
-    <AppContext.Provider value={{
-      currentUser,
-      students,
-      events,
-      birthdays,
-      loading,
-      error,
-      addStudent,
-      deleteStudent,
-      addEvent,
-      deleteEvent,
-      editEvent,
-      fetchAllData,
-      setStudents,
-      setEvents
-    }}>
+    <AppContext.Provider value={value}>
       {children}
     </AppContext.Provider>
   )
